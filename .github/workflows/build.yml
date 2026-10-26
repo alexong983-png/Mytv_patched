@@ -1,0 +1,19 @@
+name: Build patched APK
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download original APK
+        run: curl -L -o Mytv_2_4_1.apk https://github.com/alexong983-png/Mytv_patched/releases/download/v1/Mytv_2_4_1.apk
+      - run: bash build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Mytv_patched
+          path: Mytv_patched.apk
