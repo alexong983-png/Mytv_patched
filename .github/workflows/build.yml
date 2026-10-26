@@ -1,6 +1,8 @@
 name: Build patched APK
 on:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,11 +16,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download v1 --pattern "*.apk" --output Mytv_2_4_1.apk
+          gh release download v1 --pattern "Mytv_2*.apk" --output Mytv_2_4_1.apk
           ls -l Mytv_2_4_1.apk
-          unzip -tq Mytv_2_4_1.apk | tail -1
       - run: bash build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Mytv_patched
-          path: Mytv_patched.apk
+      - name: Publish patched APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload v1 Mytv_patched.apk --clobber
