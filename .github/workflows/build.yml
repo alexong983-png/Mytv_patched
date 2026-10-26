@@ -11,7 +11,12 @@ jobs:
           distribution: temurin
           java-version: '17'
       - name: Download original APK
-        run: curl -fL -o Mytv_2_4_1.apk https://github.com/alexong983-png/Mytv_patched/releases/download/v1/Mytv_2_4_1.apk
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v1 --pattern "*.apk" --output Mytv_2_4_1.apk
+          ls -l Mytv_2_4_1.apk
+          unzip -tq Mytv_2_4_1.apk | tail -1
       - run: bash build.sh
       - uses: actions/upload-artifact@v4
         with:
