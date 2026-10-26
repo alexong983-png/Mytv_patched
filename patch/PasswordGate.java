@@ -2,6 +2,8 @@ package com.patch.gate;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
+import android.os.Bundle;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -19,6 +21,37 @@ public class PasswordGate {
     private static final String PASSWORD = "6868";
     private static final String VOD_URL = "https://bit.ly/jaren22";
     private static final String TAG = "PasswordGate";
+
+    private static int live = 0;
+    private static Activity pending = null;
+
+    public static void install(Application app) {
+        try {
+            app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+                @Override public void onActivityCreated(Activity a, Bundle b) {
+                    if (live == 0) pending = a;
+                    live++;
+                }
+                @Override public void onActivityStarted(Activity a) { }
+                @Override public void onActivityResumed(Activity a) {
+                    if (a == pending) {
+                        pending = null;
+                        show(a);
+                    }
+                }
+                @Override public void onActivityPaused(Activity a) { }
+                @Override public void onActivityStopped(Activity a) { }
+                @Override public void onActivitySaveInstanceState(Activity a, Bundle b) { }
+                @Override public void onActivityDestroyed(Activity a) {
+                    live--;
+                    if (live < 0) live = 0;
+                    if (a == pending) pending = null;
+                }
+            });
+        } catch (Throwable t) {
+            Log.w(TAG, "install failed", t);
+        }
+    }
 
     public static void show(final Activity activity) {
         try {
